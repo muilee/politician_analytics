@@ -1,0 +1,152 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>政治大分析</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <!-- Fontawesome core CSS -->
+    <!--    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />-->
+    <!--GOOGLE FONT -->
+    <!--    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>-->
+    <!--Slide Show Css -->
+    <link href="{% static 'css/main-style.css' %}" rel="stylesheet" />
+    <!-- custom CSS here -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">BIG DATA</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Sign up</a></li>
+                    <li><a href="#">Login</a></li>
+                    <li><a href="#">Q $ A</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About us<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><strong>Call: </strong>0989524319</a></li>
+                            <li><a href="#"><strong>Mail: </strong>a70181346@gmail.com</a></li>
+                            <li class="divider"></li>
+                            <li>
+                            </ul>
+
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                </div>
+                <!-- /.container-fluid -->
+            </nav>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="main box-border">
+                            <div id="mi-slider" class="mi-slider">
+                                <ul>
+                                    <li><a href="{% url 'politician' 10150145806225128 %}">
+                                        <img src="{% static 'images/10150145806225128' %}" ><h3>朱立倫</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 261813197541354 %}">
+                                        <img src="{% static 'images/261813197541354' %}" ><h3>侯友宜</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 805460986214082 %}">
+                                        <img src="{% static 'images/805460986214082' %}"><h3>蔣萬安</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 184799244894343 %}">
+                                        <img src="{% static 'images/184799244894343' %}"><h3>蔡正元</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 191690867518507 %}">
+                                        <img src="{% static 'images/191690867518507' %}"><h3>江啟臣</h3>
+                                    </a></li>
+                                </ul>
+                                <ul>
+                                    <li><a href="{% url 'politician' 1380211668909443 %}">
+                                        <img src="{% static 'images/1380211668909443' %}" ><h3>姚文智</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 122936517768637 %}">
+                                        <img src="{% static 'images/122936517768637' %}" ><h3>陳其邁</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 333058400178329 %}">
+                                        <img src="{% static 'images/333058400178329' %}" ><h3>鄭文燦</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 46251501064 %}">
+                                        <img src="{% static 'images/46251501064' %}" ><h3>蔡英文</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 152472278103133 %}">
+                                        <img src="{% static 'images/152472278103133' %}" ><h3>賴清德</h3>
+                                    </a></li>
+                                </ul>
+                                <ul>
+                                    <li><a href="{% url 'politician' 852926604746233 %}">
+                                        <img src="{% static 'images/852926604746233' %}"><h3>洪慈庸</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 449664581882455 %}">
+                                        <img src="{% static 'images/449664581882455' %}"><h3>黃國昌</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 365320250345879 %}">
+                                        <img src="{% static 'images/365320250345879' %}"><h3>林昶佐</h3>
+                                    </a></li>
+                                </ul>
+                                <ul>
+                                    <li><a href="{% url 'politician' 136845026417486 %}">
+                                        <img src="{% static 'images/136845026417486' %}"><h3>柯文哲</h3>
+                                    </a></li>
+                                    <li><a href="{% url 'politician' 360151611020961 %}">
+                                        <img src="{% static 'images/360151611020961' %}"><h3>李錫錕</h3>
+                                    </a></li>
+                                </ul>
+                                <nav>
+                                    <a href="#">國民黨</a>
+                                    <a href="#">民進黨</a>
+                                    <a href="#">時代力量</a>
+                                    <a href="#">無黨籍</a>
+                                </nav>
+                            </div>
+
+                        </div>
+                        <br />
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container -->
+
+            <!-- /.col -->
+            <!--Footer end -->
+            <!--Core JavaScript file  -->
+
+            <script src="{% static 'js/jquery-1.10.2.js' %}"></script>
+            <!--bootstrap JavaScript file  -->
+            <script src="{% static 'js/bootstrap.js' %}"></script>
+            <!--Slider JavaScript file  -->
+            <script src="{% static 'js/modernizr.custom.63321.js' %}"></script>
+            <script src="{% static 'js/jquery.catslider.js' %}"></script>
+            <script>
+                $(function () {
+
+                    $('#mi-slider').catslider();
+
+                });
+            </script>
+        </body>
+        </html>
