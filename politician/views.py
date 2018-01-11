@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from pymongo import MongoClient
+# from bson.code import Code
 
 politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "360151611020961": "李錫錕", 
                   "449664581882455": "黃國昌", "261813197541354": "侯友宜", "109391162488374": "盧秀燕",
@@ -11,6 +12,22 @@ politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "3
                   "10150145806225128": "朱立倫", "365320250345879": "林昶佐", "232716627404": "陳菊",
                   "600540963315152": "丁守中", "153819538009272": "林佳龍", "805460986214082": "蔣萬安",
                   "1380211668909443": "姚文智", "184799244894343": "蔡正元"}
+
+# mapper = Code("""
+#               function (){
+#                   emit(this.created_time, 1);
+#               }
+#               """)
+
+# reducer = Code("""
+#               function (key, values){
+#                   var total = 0;
+#                   for(var i = 0; i < values.length; i++){
+#                       total += parseInt(values[i]);
+#                   };
+#                   return total;
+#               }
+#               """)
 
 class MongoConnection(object):
 	client = None
@@ -24,7 +41,6 @@ class MongoConnection(object):
 			return MongoConnection.client
 
 
-# @login_required(login_url="login/")
 def index(request):
 	return render(request, "politician/index.html", locals())
 
@@ -59,12 +75,20 @@ def politician(request, id):
 	positive_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$gt": 0.1}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$gt": 0.1}, "gender": {"$nin": [None]}})
 	positive_man_percent = 1 - positive_woman_percent
 
+	negative_woman = str(round(negative_woman_percent * 100, 1)) + "%"
+	negative_man = str(round(negative_man_percent * 100, 1)) + "%"
+	central_woman = str(round(central_woman_percent * 100, 1)) + "%"
+	central_man = str(round(central_man_percent * 100, 1)) + "%"
+	positive_woman = str(round(positive_woman_percent * 100, 1)) + "%"
+	positive_man = str(round(positive_man_percent * 100, 1)) + "%"
+
 
 	keyword_collection = db["keywords"]
-
 	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(10)
 
 
+	# results = comment_collection.map_reduce(mapper, reducer, "mapReduce", query={"politician_id":id, "created_time": {"$gte": start, "$lte": end}})
+	# data = list(results.find())
 
 	return render(request, "politician/chart.html", locals())
 

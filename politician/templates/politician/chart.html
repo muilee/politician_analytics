@@ -102,19 +102,54 @@
             <div id="page-inner">
                 <div class="row">
                     <div class="col-md-12">
-                     <h2>{{ politician_name }} ({{ start|date:"Y-m-d" }} ~ {{ end|date:"Y-m-d" }})</h2>   
-                     <h3>Hot  {{ hot }}</h3>
-                     <h5>negative {{ negative_comments_number }} &nbsp;woman {{ negative_woman_percent }} &nbsp;man {{negative_man_percent}}</h5>
-                     <h5>central {{ central_comments_number }} &nbsp;woman {{ central_woman_percent }} &nbsp;man {{central_man_percent}}</h5>
-                     <h5>positive {{ positive_comments_number }} &nbsp;woman {{ positive_woman_percent }} &nbsp;man {{positive_man_percent}}</h5>
+                       <h2>{{ politician_name }} ({{ start|date:"Y-m-d" }} ~ {{ end|date:"Y-m-d" }})</h2>   
+                       <h3>Hot  {{ hot }}</h3>
+                       <table class="table table-striped">
+                          <thead>
+                            <tr>
+                                <th>Emotion</th>
+                                <th>Number</th>
+                                <th>Woman (in percent)</th>
+                                <th>Man (in percent)</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Negative</td>
+                                <td>{{ negative_comments_number }}</td>
+                                <td>{{ negative_woman }}</td>
+                                <td>{{ negative_man }}</td>
+                            </tr>
+                            <tr>
+                                <td>Central</td>
+                                <td>{{ central_comments_number }}</td>
+                                <td>{{ central_woman }}</td>
+                                <td>{{ central_man }}</td>
+                            </tr>
+                            <tr>
+                                <td>Positive</td>
+                                <td>{{ positive_comments_number }}</td>
+                                <td>{{ positive_woman }}</td>
+                                <td>{{ positive_man }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
 
-                 </div>
-             </div>
-             <!-- /. ROW  -->
-             <hr />
+                </div>
+            </div>
 
-             <div class="row"> 
+
+            <input type="hidden" value="{{negative_comments_number}}" id="negative">
+            <input type="hidden" value="{{central_comments_number}}" id="central">
+            <input type="hidden" value="{{positive_comments_number}}" id="positive">
+
+
+            <!-- /. ROW  -->
+            <hr />
+
+            <div class="row"> 
 
 
 <!--                 <div class="col-md-6 col-sm-12 col-xs-12">
@@ -191,16 +226,17 @@
                     <td>{{ keyword.likes }}</td>
                     <td>{{ keyword.shares }}</td>
                     {% if keyword.post_score < 0 %}
-                        <td>Negative</td>
+                    <td>Negative</td>
                     {% elif keyword.post_score >= 0 and keyword.post_score <= 0.1 %}
-                        <td>Central</td>
+                    <td>Central</td>
                     {% else %}
-                        <td>Positive</td>
+                    <td>Positive</td>
                     {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {{data}}
     </div>
 </div>
 <!-- /. PAGE INNER  -->

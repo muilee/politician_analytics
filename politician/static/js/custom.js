@@ -78,17 +78,24 @@
             /*====================================
           MORRIS DONUT CHART
        ======================================*/
+            var p = $("#positive").val();
+            // var {{ positive_comments_number }}
+            var c = $("#central").val();
+            // var {{ central_comments_number }}
+            var n = $("#negative").val();
+            // var {{ negative_comments_number }}
+
             Morris.Donut({
                 element: 'morris-donut-chart',
                 data: [{
                     label: "positive",
-                    value: 40
+                    value: p
                 }, {
                     label: "central",
-                    value: 40
+                    value: c
                 }, {
                     label: "negative",
-                    value: 20
+                    value: n
                 }],
                 resize: true
             });
