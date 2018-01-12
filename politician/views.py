@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from pymongo import MongoClient
-# from bson.code import Code
 
 politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "360151611020961": "李錫錕", 
                   "449664581882455": "黃國昌", "261813197541354": "侯友宜", "109391162488374": "盧秀燕",
@@ -13,21 +12,6 @@ politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "3
                   "600540963315152": "丁守中", "153819538009272": "林佳龍", "805460986214082": "蔣萬安",
                   "1380211668909443": "姚文智", "184799244894343": "蔡正元"}
 
-# mapper = Code("""
-#               function (){
-#                   emit(this.created_time, 1);
-#               }
-#               """)
-
-# reducer = Code("""
-#               function (key, values){
-#                   var total = 0;
-#                   for(var i = 0; i < values.length; i++){
-#                       total += parseInt(values[i]);
-#                   };
-#                   return total;
-#               }
-#               """)
 
 class MongoConnection(object):
 	client = None
@@ -44,7 +28,7 @@ class MongoConnection(object):
 def index(request):
 	return render(request, "politician/index.html", locals())
 
-# @login_required(login_url="login/")
+@login_required(login_url="/accounts/login/")
 def politician(request, id):
 	id = str(id)
 	politician_image = "images/" + id
@@ -86,9 +70,8 @@ def politician(request, id):
 	keyword_collection = db["keywords"]
 	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(10)
 
-
-	# results = comment_collection.map_reduce(mapper, reducer, "mapReduce", query={"politician_id":id, "created_time": {"$gte": start, "$lte": end}})
-	# data = list(results.find())
+	map_reduce_collection = db["mapReduce"]
+	data = list(map_reduce_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0, "politician_id":0}).sort([("created_time", 1)]))
 
 	return render(request, "politician/chart.html", locals())
 
@@ -99,19 +82,18 @@ def model_prediction(request, id):
 
 
 
-# def login(request):
-# 	if request.POST:
-# 		username = ""
-# 		username = request.POST.get("username")
-# 		password = request.POST.get("password")
-# 		user = authenticate(username=username, password=password)
+def user_login(request):
+	if request.POST:
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
 		
-# 		if user is not None and user.is_active:
-# 			login(request, user)
-# 			return redirect("/politician/")
-# 	else:
-# 		return render(reauest, "account/login.html", {})
+		if user is not None:
+			login(request, user)
+			return redirect("/politician")
+	else:
+		return render(request, "account/login.html", locals())
 
-# def logout(request):
-# 	logout(request)
-# 	return render(request, "account/login.html", {})
+def user_logout(request):
+	logout(request)
+	return redirect("/politician")

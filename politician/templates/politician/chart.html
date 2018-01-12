@@ -41,7 +41,7 @@
                     <input style="color: #000000;" type="text" placeholder="start" aria-label="Search" id="start" name="start"> &nbsp;
                     <input style="color: #000000;" type="text" placeholder="end" aria-label="Search" id="end" name="end"> &nbsp;
                     <input type="submit" value="Submit" class="btn btn-danger square-btn-adjust">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="#" class="btn btn-danger square-btn-adjust">Logout</a> 
+                    <a href="{% url 'logout' %}" class="btn btn-danger square-btn-adjust">Logout</a> 
                 </form>
                 
             </div>
@@ -144,6 +144,7 @@
             <input type="hidden" value="{{negative_comments_number}}" id="negative">
             <input type="hidden" value="{{central_comments_number}}" id="central">
             <input type="hidden" value="{{positive_comments_number}}" id="positive">
+            <input type="hidden" value="{{data}}" id="data">
 
 
             <!-- /. ROW  -->
