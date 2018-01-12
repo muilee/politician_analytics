@@ -94,6 +94,7 @@ def user_login(request):
 	else:
 		return render(request, "account/login.html", locals())
 
+@login_required(login_url="/accounts/login/")
 def user_logout(request):
 	logout(request)
 	return redirect("/politician")
