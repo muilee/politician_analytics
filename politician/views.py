@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from pymongo import MongoClient
+import json
 
 politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "360151611020961": "李錫錕", 
                   "449664581882455": "黃國昌", "261813197541354": "侯友宜", "109391162488374": "盧秀燕",
@@ -19,7 +20,7 @@ class MongoConnection(object):
 	@staticmethod
 	def getConnection():
 		if MongoConnection.client is None:
-			MongoConnection.client = MongoClient("mongodb://127.0.0.1:27017")
+			MongoConnection.client = MongoClient("mongodb://10.120.37.108:27017")
 			return MongoConnection.client
 		else:
 			return MongoConnection.client
@@ -38,9 +39,9 @@ def politician(request, id):
 	end = datetime.strptime("2018-01-01", "%Y-%m-%d")
 
 
-	if request.POST:
-		start = datetime.strptime(request.POST["start"], "%Y-%m-%d")
-		end = datetime.strptime(request.POST["end"], "%Y-%m-%d")
+	if request.GET:
+		start = datetime.strptime(request.GET["start"], "%Y-%m-%d")
+		end = datetime.strptime(request.GET["end"], "%Y-%m-%d")
 
 	client = MongoConnection.getConnection()
 	db = client["project"]
@@ -68,10 +69,13 @@ def politician(request, id):
 
 
 	keyword_collection = db["keywords"]
-	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(10)
+	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(100)
 
 	map_reduce_collection = db["mapReduce"]
 	data = list(map_reduce_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0, "politician_id":0}).sort([("created_time", 1)]))
+	for x in data:
+		x['created_time'] = x['created_time'].strftime("%Y-%m-%d")
+	data = json.dumps(data)
 
 	return render(request, "politician/chart.html", locals())
 
