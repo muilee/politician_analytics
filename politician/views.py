@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from pymongo import MongoClient
 import json
+from django.contrib.auth.models import User
 
 politicin_dict = {"136845026417486": "柯文哲", "46251501064": "蔡英文", "360151611020961": "李錫錕", 
-                  "449664581882455": "黃國昌", "261813197541354": "侯友宜", "109391162488374": "盧秀燕",
+                  "449664581882455": "黃國昌", "261813197541354": "侯友宜",
                   "191690867518507": "江啟臣", "122936517768637": "陳其邁", "333058400178329": "鄭文燦",
-                  "118250504903757": "馬英九", "152472278103133": "賴清德", "852926604746233": "洪慈庸",
-                  "10150145806225128": "朱立倫", "365320250345879": "林昶佐", "232716627404": "陳菊",
-                  "600540963315152": "丁守中", "153819538009272": "林佳龍", "805460986214082": "蔣萬安",
+                  "152472278103133": "賴清德", "852926604746233": "洪慈庸",
+                  "10150145806225128": "朱立倫", "365320250345879": "林昶佐", "805460986214082": "蔣萬安",
                   "1380211668909443": "姚文智", "184799244894343": "蔡正元"}
 
 
@@ -49,15 +49,15 @@ def politician(request, id):
 
 	hot = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end} })
 
-	negative_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lt": 0}})
-	central_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lte": 0.1, "$gte": 0}})
-	positive_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$gt": 0.1}})
+	negative_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lt": -0.2}})
+	central_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lte": 0.1, "$gte": -0.2}})
+	positive_comments_number = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$gt": 0.1}})
 
-	negative_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lt": 0}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lt": 0}, "gender": {"$nin": [None]}})
+	negative_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lt": -0.2}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lt": -0.2}, "gender": {"$nin": [None]}})
 	negative_man_percent = 1 - negative_woman_percent
-	central_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lte": 0.1, "$gte": 0}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$lte": 0.1, "$gte": 0}, "gender": {"$nin": [None]}})
+	central_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lte": 0.1, "$gte": -0.2}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$lte": 0.1, "$gte": -0.2}, "gender": {"$nin": [None]}})
 	central_man_percent = 1 - central_woman_percent
-	positive_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$gt": 0.1}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score": {"$gt": 0.1}, "gender": {"$nin": [None]}})
+	positive_woman_percent = comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$gt": 0.1}, "gender": 1}) / comment_collection.count({"politician_id": id, "created_time": {"$gte": start, "$lte": end}, "score_NN": {"$gt": 0.1}, "gender": {"$nin": [None]}})
 	positive_man_percent = 1 - positive_woman_percent
 
 	negative_woman = str(round(negative_woman_percent * 100, 1)) + "%"
@@ -76,6 +76,8 @@ def politician(request, id):
 	for x in data:
 		x['created_time'] = x['created_time'].strftime("%Y-%m-%d")
 	data = json.dumps(data)
+	politition_list = [(id, name) for id, name in politicin_dict.items()]
+
 
 	return render(request, "politician/chart.html", locals())
 
@@ -83,7 +85,15 @@ def model_prediction(request, id):
 	id = str(id)
 
 
+def user_register(request):
+	if request.method == 'POST' and request.POST:
+		username = request.POST["username"]
+		password = request.POST["password"]
+		user = User.objects.create_user(username=username,password=password)
+		return redirect("/politician")
 
+	else:
+		return render(request, "account/register.html", locals())
 
 
 def user_login(request):

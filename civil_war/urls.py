@@ -22,4 +22,5 @@ urlpatterns = [
     path('politician/', include('politician.urls')),
     path("accounts/login/", views.user_login, name="login"),
     path("accounts/logout/", views.user_logout, name="logout"),
+    path("accounts/register/", views.user_register, name="register"),
 ]
