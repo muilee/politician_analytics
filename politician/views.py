@@ -34,6 +34,8 @@ def politician(request, id):
 	id = str(id)
 	politician_image = "images/" + id
 	politician_name = politicin_dict.get(id)
+	politition_list = [(id, name) for id, name in politicin_dict.items()]
+
 
 	start = datetime.strptime("2017-10-01", "%Y-%m-%d")
 	end = datetime.strptime("2018-01-01", "%Y-%m-%d")
@@ -69,20 +71,16 @@ def politician(request, id):
 
 
 	keyword_collection = db["keywords"]
-	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(100)
+	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("new_tfidf", -1)]).limit(100)
 
 	map_reduce_collection = db["mapReduce"]
 	data = list(map_reduce_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0, "politician_id":0}).sort([("created_time", 1)]))
 	for x in data:
 		x['created_time'] = x['created_time'].strftime("%Y-%m-%d")
 	data = json.dumps(data)
-	politition_list = [(id, name) for id, name in politicin_dict.items()]
-
-
+	
 	return render(request, "politician/chart.html", locals())
 
-def model_prediction(request, id):
-	id = str(id)
 
 
 def user_register(request):
@@ -90,7 +88,7 @@ def user_register(request):
 		username = request.POST["username"]
 		password = request.POST["password"]
 		user = User.objects.create_user(username=username,password=password)
-		return redirect("/politician")
+		return redirect("/accounts/login/")
 
 	else:
 		return render(request, "account/register.html", locals())

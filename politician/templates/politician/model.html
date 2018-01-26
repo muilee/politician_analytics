@@ -1,0 +1,542 @@
+{% load static %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ politician_name }}</title>
+  <!-- BOOTSTRAP STYLES-->
+  <link href="{% static 'css/bootstrap1.css' %}" rel="stylesheet" />
+  <!-- FONTAWESOME STYLES-->
+  <!--  <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet" />-->
+  <!-- MORRIS CHART STYLES-->
+  <link href="{% static 'js/morris/morris-0.4.3.min.css' %}" rel="stylesheet" />
+  <!-- CUSTOM STYLES-->
+  <link href="{% static 'css/custom.css' %}" rel="stylesheet" />
+  <!-- GOOGLE FONTS-->
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+  <link href="{% static 'css/dataTables.bootstrap.css' %}" rel="stylesheet" />
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+  <style>
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: #fff;
+    font-family: 'Open-Sans',sans-serif;
+
+  }
+
+  #container{
+    margin: 0 auto;
+    position: relative;
+    width:800px;
+    overflow: visible;
+  }
+
+
+  .svg {
+    width:800px;
+    height:400px;
+    overflow: visible;
+    position:absolute;
+  }
+
+  .grid .tick {
+    stroke: lightgrey;
+    opacity: 0.3;
+    shape-rendering: crispEdges;
+  }
+  .grid path {
+    stroke-width: 0;
+  }
+
+
+  #tag {
+    color: white;
+    background: #FA283D;
+    width: 150px;
+    position: absolute;
+    display: none;
+    padding:3px 6px;
+    margin-left: -80px;
+    font-size: 11px;
+  }
+
+
+
+  #tag:before {
+    border: solid transparent;
+    content: ' ';
+    height: 0;
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    width: 0;
+    border-width: 10px;
+    border-bottom-color: #FA283D;
+    top: -20px;
+  }
+</style>
+</head>
+<body>
+  <div id="wrapper">
+    <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{% url 'index' %}"><strong>政治</strong>BIG DATA</a> 
+      </div>
+      <div style="color: white;padding: 15px 50px 5px 50px;float: right;font-size: 16px;">
+        <form action="/politician/{{ id }}" method="get" accept-charset="utf-8">
+          <!-- {% csrf_token %}   用POST一定要用 類似於POST的密碼  -->
+          <label>輸入時間&nbsp;&nbsp;(格式範例:2017-12-12) &nbsp;</label>
+          <input style="color: #000000;" type="text" placeholder="start" aria-label="Search" id="start" name="start"> &nbsp;
+          <input style="color: #000000;" type="text" placeholder="end" aria-label="Search" id="end" name="end"> &nbsp;
+          <input type="submit" value="提交" class="btn btn-danger square-btn-adjust">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <a href="{% url 'register' %}" class="btn btn-danger square-btn-adjust">註冊</a> 
+          <a href="{% url 'logout' %}" class="btn btn-danger square-btn-adjust">登出</a> 
+        </form> 
+
+      </div>
+    </nav>   
+    <!-- /. NAV TOP  -->
+    <nav class="navbar-default navbar-side" role="navigation">
+      <div class="sidebar-collapse">
+        <ul class="nav" id="main-menu">
+          <li class="text-center">
+            <img src="{% static politician_image %}" class="user-image img-responsive"/>   <!-- politician_image沒有引號引起來 就是變數的意思  -->
+          </li>
+
+          
+          <li>
+            <a href="{% url 'politician' id %}"><i class="fa fa-dashboard fa-3x"></i>儀表板</a>
+          </li>
+          <li>
+            <a  href="{% url 'model_prediction' id %}"><i class="fa fa-desktop fa-3x"></i>模型預測</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa fa-sitemap fa-3x"></i>其他人物<span class="fa arrow"></span></a>
+            <ul class="nav nav-second-level">
+              {% for politition in politition_list %}
+              {% if politition.0 != id %}
+              <li>
+                <a href="{% url 'model_prediction' politition.0 %}">{{ politition.1 }}</a>
+              </li>
+              {% endif %}
+              {% endfor %}
+
+            </ul>
+          </li>  
+        </ul>
+
+      </div>
+
+    </nav>  
+    <!-- /. NAV SIDE  -->        
+
+    <div id="page-wrapper" >
+      <div id="page-inner">
+        <div class="row">
+          <div class="col-md-12">
+           <h2>{{ politician_name }} &nbsp; ({{ start|date:"Y-m-d" }} ~ {{ end|date:"Y-m-d" }}) </h2> 
+
+         </div>
+       </div>
+
+
+       <div id = "container">
+        <div class = "svg"></div>
+        <div id = "tag"></div>
+      </div>
+
+    </div>
+    <!-- /. PAGE INNER  -->
+  </div>
+  <!-- /. PAGE WRAPPER  -->
+</div>
+<!-- /. WRAPPER  -->
+<!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+<!-- JQUERY SCRIPTS -->
+<script src="{% static 'js/jquery-1.10.2.js' %}"></script>
+<!-- BOOTSTRAP SCRIPTS -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- METISMENU SCRIPTS -->
+<script src="{% static 'js/jquery.metisMenu.js' %}"></script>
+<!-- MORRIS CHART SCRIPTS -->
+<script src="{% static 'js/raphael-2.1.0.min.js' %}"></script>
+<script src="{% static 'js/morris.js' %}"></script>
+<!-- CUSTOM SCRIPTS -->
+
+<script src="{% static 'js/jquery.dataTables.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap.js' %}"></script>    
+
+<script>
+  var w = 800;
+  var h = 400;
+
+
+  var svg = d3.selectAll(".svg")
+  //.selectAll("svg")
+  .append("svg")
+  .attr("width", w)
+  .attr("height", h)
+  .attr("class", "svg");
+
+
+  var taskArray = [
+  {
+    task: "conceptualize",
+    // type: "development",
+    startTime: "2013-1-28", //year/month/day
+    endTime: "2013-2-1",
+    // details: "This actually didn't take any conceptualization"
+  },
+
+  {
+    task: "sketch",
+    // type: "development",
+    startTime: "2013-2-1",
+    endTime: "2013-2-6",
+    details: "No sketching either, really"
+  },
+
+  {
+    task: "color profiles",
+    // type: "development",
+    startTime: "2013-2-6",
+    endTime: "2013-2-9"
+  },
+
+  {
+    task: "HTML",
+    // type: "coding",
+    startTime: "2013-2-2",
+    endTime: "2013-2-6",
+    details: "all three lines of it"
+  },
+
+  {
+    task: "write the JS",
+    // type: "coding",
+    startTime: "2013-2-6",
+    endTime: "2013-2-9"
+  },
+
+  {
+    task: "advertise",
+    // type: "promotion",
+    startTime: "2013-2-9",
+    endTime: "2013-2-12",
+    details: "This counts, right?"
+  },
+
+  {
+    task: "spam links",
+    // type: "promotion",
+    startTime: "2013-2-12",
+    endTime: "2013-2-14"
+  },
+  {
+    task: "eat",
+    // type: "celebration",
+    startTime: "2013-2-8",
+    endTime: "2013-2-13",
+    details: "All the things"
+  },
+
+  {
+    task: "crying",
+    // type: "celebration",
+    startTime: "2013-2-13",
+    endTime: "2013-2-16"
+  },
+
+  ];
+
+  var dateFormat = d3.time.format("%Y-%m-%d");
+
+  var timeScale = d3.time.scale()
+  .domain([d3.min(taskArray, function(d) {return dateFormat.parse(d.startTime);}),
+   d3.max(taskArray, function(d) {return dateFormat.parse(d.endTime);})])
+  .range([0,w-150]);
+
+  var categories = new Array();
+
+  for (var i = 0; i < taskArray.length; i++){
+    categories.push(taskArray[i].type);
+  }
+
+var catsUnfiltered = categories; //for vert labels
+
+categories = checkUnique(categories);
+
+
+makeGant(taskArray, w, h);
+
+var title = svg.append("text")
+.text("Gantt Chart Process")
+.attr("x", w/2)
+.attr("y", 25)
+.attr("text-anchor", "middle")
+.attr("font-size", 18)
+.attr("fill", "#009FFC");
+
+
+
+function makeGant(tasks, pageWidth, pageHeight){
+
+  var barHeight = 20;
+  var gap = barHeight + 4;
+  var topPadding = 75;
+  var sidePadding = 75;
+
+  var colorScale = d3.scale.linear()
+  .domain([0, categories.length])
+  .range(["#00B9FA", "#F95002"])
+  .interpolate(d3.interpolateHcl);
+
+  makeGrid(sidePadding, topPadding, pageWidth, pageHeight);
+  drawRects(tasks, gap, topPadding, sidePadding, barHeight, colorScale, pageWidth, pageHeight);
+  vertLabels(gap, topPadding, sidePadding, barHeight, colorScale);
+
+}
+
+
+function drawRects(theArray, theGap, theTopPad, theSidePad, theBarHeight, theColorScale, w, h){
+
+  var bigRects = svg.append("g")
+  .selectAll("rect")
+  .data(theArray)
+  .enter()
+  .append("rect")
+  .attr("x", 0)
+  .attr("y", function(d, i){
+    return i*theGap + theTopPad - 2;
+  })
+  .attr("width", function(d){
+    return w-theSidePad/2;
+  })
+  .attr("height", theGap)
+  .attr("stroke", "none")
+  .attr("fill", function(d){
+    for (var i = 0; i < categories.length; i++){
+      if (d.type == categories[i]){
+        return d3.rgb(theColorScale(i));
+      }
+    }
+  })
+  .attr("opacity", 0.2);
+
+
+  var rectangles = svg.append('g')
+  .selectAll("rect")
+  .data(theArray)
+  .enter();
+
+
+  var innerRects = rectangles.append("rect")
+  .attr("rx", 3)
+  .attr("ry", 3)
+  .attr("x", function(d){
+    return timeScale(dateFormat.parse(d.startTime)) + theSidePad;
+  })
+  .attr("y", function(d, i){
+    return i*theGap + theTopPad;
+  })
+  .attr("width", function(d){
+    return (timeScale(dateFormat.parse(d.endTime))-timeScale(dateFormat.parse(d.startTime)));
+  })
+  .attr("height", theBarHeight)
+  .attr("stroke", "none")
+  .attr("fill", function(d){
+    for (var i = 0; i < categories.length; i++){
+      if (d.type == categories[i]){
+        return d3.rgb(theColorScale(i));
+      }
+    }
+  })
+
+
+  var rectText = rectangles.append("text")
+  .text(function(d){
+    return d.task;
+  })
+  .attr("x", function(d){
+    return (timeScale(dateFormat.parse(d.endTime))-timeScale(dateFormat.parse(d.startTime)))/2 + timeScale(dateFormat.parse(d.startTime)) + theSidePad;
+  })
+  .attr("y", function(d, i){
+    return i*theGap + 14+ theTopPad;
+  })
+  .attr("font-size", 11)
+  .attr("text-anchor", "middle")
+  .attr("text-height", theBarHeight)
+  .attr("fill", "#fff");
+
+
+  rectText.on('mouseover', function(e) {
+ // console.log(this.x.animVal.getItem(this));
+ var tag = "";
+
+ if (d3.select(this).data()[0].details != undefined){
+  tag = "Task: " + d3.select(this).data()[0].task + "<br/>" + 
+  "Type: " + d3.select(this).data()[0].type + "<br/>" + 
+  "Starts: " + d3.select(this).data()[0].startTime + "<br/>" + 
+  "Ends: " + d3.select(this).data()[0].endTime + "<br/>" + 
+  "Details: " + d3.select(this).data()[0].details;
+} else {
+  tag = "Task: " + d3.select(this).data()[0].task + "<br/>" + 
+  "Type: " + d3.select(this).data()[0].type + "<br/>" + 
+  "Starts: " + d3.select(this).data()[0].startTime + "<br/>" + 
+  "Ends: " + d3.select(this).data()[0].endTime;
+}
+var output = document.getElementById("tag");
+
+var x = this.x.animVal.getItem(this) + "px";
+var y = this.y.animVal.getItem(this) + 25 + "px";
+
+output.innerHTML = tag;
+output.style.top = y;
+output.style.left = x;
+output.style.display = "block";
+}).on('mouseout', function() {
+ var output = document.getElementById("tag");
+ output.style.display = "none";
+});
+
+
+innerRects.on('mouseover', function(e) {
+ //console.log(this);
+ var tag = "";
+
+ if (d3.select(this).data()[0].details != undefined){
+  tag = "Task: " + d3.select(this).data()[0].task + "<br/>" + 
+  "Type: " + d3.select(this).data()[0].type + "<br/>" + 
+  "Starts: " + d3.select(this).data()[0].startTime + "<br/>" + 
+  "Ends: " + d3.select(this).data()[0].endTime + "<br/>" + 
+  "Details: " + d3.select(this).data()[0].details;
+} else {
+  tag = "Task: " + d3.select(this).data()[0].task + "<br/>" + 
+  "Type: " + d3.select(this).data()[0].type + "<br/>" + 
+  "Starts: " + d3.select(this).data()[0].startTime + "<br/>" + 
+  "Ends: " + d3.select(this).data()[0].endTime;
+}
+var output = document.getElementById("tag");
+
+var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
+var y = this.y.animVal.value + 25 + "px";
+
+output.innerHTML = tag;
+output.style.top = y;
+output.style.left = x;
+output.style.display = "block";
+}).on('mouseout', function() {
+ var output = document.getElementById("tag");
+ output.style.display = "none";
+
+});
+
+
+
+}
+
+
+function makeGrid(theSidePad, theTopPad, w, h){
+
+  var xAxis = d3.svg.axis()
+  .scale(timeScale)
+  .orient('bottom')
+  .ticks(d3.time.days, 1)
+  .tickSize(-h+theTopPad+20, 0, 0)
+  .tickFormat(d3.time.format('%d %b'));
+
+  var grid = svg.append('g')
+  .attr('class', 'grid')
+  .attr('transform', 'translate(' +theSidePad + ', ' + (h - 50) + ')')
+  .call(xAxis)
+  .selectAll("text")  
+  .style("text-anchor", "middle")
+  .attr("fill", "#000")
+  .attr("stroke", "none")
+  .attr("font-size", 10)
+  .attr("dy", "1em");
+}
+
+function vertLabels(theGap, theTopPad, theSidePad, theBarHeight, theColorScale){
+  var numOccurances = new Array();
+  var prevGap = 0;
+
+  for (var i = 0; i < categories.length; i++){
+    numOccurances[i] = [categories[i], getCount(categories[i], catsUnfiltered)];
+  }
+
+  var axisText = svg.append("g") //without doing this, impossible to put grid lines behind text
+  .selectAll("text")
+  .data(numOccurances)
+  .enter()
+  .append("text")
+  .text(function(d){
+    return d[0];
+  })
+  .attr("x", 10)
+  .attr("y", function(d, i){
+    if (i > 0){
+      for (var j = 0; j < i; j++){
+        prevGap += numOccurances[i-1][1];
+         // console.log(prevGap);
+         return d[1]*theGap/2 + prevGap*theGap + theTopPad;
+       }
+     } else{
+      return d[1]*theGap/2 + theTopPad;
+    }
+  })
+  .attr("font-size", 11)
+  .attr("text-anchor", "start")
+  .attr("text-height", 14)
+  .attr("fill", function(d){
+    for (var i = 0; i < categories.length; i++){
+      if (d[0] == categories[i]){
+        //  console.log("true!");
+        return d3.rgb(theColorScale(i)).darker();
+      }
+    }
+  });
+
+}
+
+//from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript
+function checkUnique(arr) {
+  var hash = {}, result = [];
+  for ( var i = 0, l = arr.length; i < l; ++i ) {
+        if ( !hash.hasOwnProperty(arr[i]) ) { //it works with objects! in FF, at least
+          hash[ arr[i] ] = true;
+          result.push(arr[i]);
+        }
+      }
+      return result;
+    }
+
+//from this stackexchange question: http://stackoverflow.com/questions/14227981/count-how-many-strings-in-an-array-have-duplicates-in-the-same-array
+function getCounts(arr) {
+    var i = arr.length, // var to loop over
+        obj = {}; // obj to store results
+    while (i) obj[arr[--i]] = (obj[arr[i]] || 0) + 1; // count occurrences
+    return obj;
+  }
+
+// get specific from everything
+function getCount(word, arr) {
+  return getCounts(arr)[word] || 0;
+}
+
+</script>
+<!--<script src="{% static 'js/custom.js' %}"></script>-->
+</body>
+</html>

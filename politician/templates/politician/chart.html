@@ -32,7 +32,7 @@
             </div>
   <div style="color: white;padding: 15px 50px 5px 50px;float: right;font-size: 16px;">
       <form action="/politician/{{ id }}" method="get" accept-charset="utf-8">
-                    {% csrf_token %}   <!-- 用POST一定要用 類似於POST的密碼  -->
+                    <!-- {% csrf_token %}   用POST一定要用 類似於POST的密碼  -->
                     <label>輸入時間&nbsp;&nbsp;(格式範例:2017-12-12) &nbsp;</label>
                     <input style="color: #000000;" type="text" placeholder="start" aria-label="Search" id="start" name="start"> &nbsp;
                     <input style="color: #000000;" type="text" placeholder="end" aria-label="Search" id="end" name="end"> &nbsp;
@@ -53,13 +53,10 @@
 				
 					
                     <li>
-                        <a href="index.html"><i class="fa fa-dashboard fa-3x"></i>儀表板</a>
+                        <a href="{% url 'politician' id %}"><i class="fa fa-dashboard fa-3x"></i>儀表板</a>
                     </li>
                     <li>
-                        <a  href="ui.html"><i class="fa fa-desktop fa-3x"></i>模型預測</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap fa-3x"></i> Multi-Level Dropdown<span class="fa arrow"></span></a>
+                        <a href="#"><i class="fa fa-sitemap fa-3x"></i>其他人物<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             {% for politition in politition_list %}
                                 {% if politition.0 != id %}
