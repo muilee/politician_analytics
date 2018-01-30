@@ -71,7 +71,7 @@ def politician(request, id):
 
 
 	keyword_collection = db["keywords"]
-	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("new_tfidf", -1)]).limit(100)
+	keywords = keyword_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0}).sort([("tfidf", -1)]).limit(100)
 
 	map_reduce_collection = db["mapReduce"]
 	data = list(map_reduce_collection.find({"politician_id": id, "created_time": {"$gte": start, "$lte": end}}, {"_id": 0, "politician_id":0}).sort([("created_time", 1)]))
